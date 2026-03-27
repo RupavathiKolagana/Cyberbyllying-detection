@@ -91,19 +91,52 @@ class XLMRobertaBiLSTM_MHA(nn.Module):
 # =========================
 # LOAD MODEL
 # =========================
-tokenizer = XLMRobertaTokenizer.from_pretrained(MODEL_DIR)
+#tokenizer = XLMRobertaTokenizer.from_pretrained(MODEL_DIR)
 
-model = XLMRobertaBiLSTM_MHA()
+#model = XLMRobertaBiLSTM_MHA()
 
-if not os.path.exists(MODEL_FILE):
-    raise FileNotFoundError(f"Model not found at {MODEL_FILE}")
+#if not os.path.exists(MODEL_FILE):
+   # raise FileNotFoundError(f"Model not found at {MODEL_FILE}")
 
 # IMPORTANT: exact loading (NO strict=False)
-model.load_state_dict(torch.load(MODEL_FILE, map_location="cpu"))
+#model.load_state_dict(torch.load(MODEL_FILE, map_location="cpu"))
 
+#device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+#model.to(device)
+#model.eval()
+
+#New Addition - Remove below lines and uncomment above code *****
+model = None
+tokenizer = None
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model.to(device)
-model.eval()
+
+def load_model():
+    global model, tokenizer
+
+    if model is None:
+        from huggingface_hub import hf_hub_download
+
+        print("Loading model...")
+
+        # tokenizer (local)
+        tokenizer = XLMRobertaTokenizer.from_pretrained(MODEL_DIR)
+
+        # download model
+        model_path = hf_hub_download(
+            repo_id="Rupavathi7/xlm_roberta_bilstm_mha",
+            filename="xlm_roberta_bilstm_mha.pt"
+        )
+
+        model = XLMRobertaBiLSTM_MHA()
+        model.load_state_dict(torch.load(model_path, map_location="cpu"))
+
+        model.to(device)
+        model.eval()
+
+        print("Model loaded successfully!")
+
+    return model, tokenizer
+
 
 # =========================
 # GLOBAL RESULTS
@@ -131,6 +164,8 @@ def preprocess_text(text):
 # =========================
 # MODEL PREDICTION
 # =========================
+#New addition - Remove below line *****
+model, tokenizer = load_model()
 def model_predict(text):
 
     text = preprocess_text(text)
@@ -238,6 +273,7 @@ def abusive_comments():
 # RUN
 # =========================
 if __name__ == "__main__":
-    threading.Thread(target=process_all_videos, daemon=True).start()
+    #uncomment below line later *****
+    #threading.Thread(target=process_all_videos, daemon=True).start()
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
