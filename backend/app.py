@@ -10,7 +10,7 @@ from threading import Lock
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from transformers import XLMRobertaTokenizer, XLMRobertaModel
-
+from huggingface_hub import hf_hub_download
 # =========================
 # FLASK APP
 # =========================
@@ -29,9 +29,12 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATASET_DIR = os.path.join(BASE_DIR, "datasets")
 VIDEO_CSV_PATH = os.path.join(DATASET_DIR, "video_ids.csv")
 
-MODEL_DIR = os.path.join(BASE_DIR, "saved_model")
-MODEL_FILE = os.path.join(MODEL_DIR, "xlm_roberta_bilstm_mha.pt")
-
+#MODEL_DIR = os.path.join(BASE_DIR, "saved_model")
+#MODEL_FILE = os.path.join(MODEL_DIR, "xlm_roberta_bilstm_mha.pt")
+MODEL_FILE= hf_hub_download(
+    repo_id="Rupavathi7/xlm_roberta_bilstm_mha",
+    filename="xlm_roberta_bilstm_mha.pt"
+)
 # =========================
 # LOAD DATA
 # =========================
